@@ -1,6 +1,8 @@
 package com.example.Management.repository;
 
 import com.example.Management.entity.IssuedDoc;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,10 +13,15 @@ import java.util.Optional;
 @Repository
 public interface IssuedDocRepository extends JpaRepository<IssuedDoc, Long> {
     Optional<IssuedDoc> findByEmployeeId(Long employeeId);
-    List<IssuedDoc> findByDateOfIssue(LocalDate dateOfIssue);
-    List<IssuedDoc> findByTypeOfDoc(String typeOfDoc);
-    List<IssuedDoc> findByIssuedBy(String issuedBy);
 
+    Page<IssuedDoc> findAll(Pageable pageable);
 
+    Page<IssuedDoc> findByEmployeeId(Long employeeId, Pageable pageable);
+
+    Page<IssuedDoc> findByTypeOfDoc(String typeOfDoc, Pageable pageable);
+
+    Page<IssuedDoc> findByIssuedBy(String issuedBy, Pageable pageable);
+
+    Page<IssuedDoc> findByDateOfIssue(LocalDate dateOfIssue, Pageable pageable);
 
 }

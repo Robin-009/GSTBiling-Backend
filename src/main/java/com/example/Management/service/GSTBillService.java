@@ -4,6 +4,8 @@ import com.example.Management.repository.GSTBillItemRepository;
 import com.example.Management.repository.GSTBillRepository;
 import com.example.Management.entity.GSTBill;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -19,26 +21,22 @@ public class GSTBillService {
     @Autowired
     private GSTBillItemRepository GSTBillItemRepository;
 
-
-
-
-    public List<GSTBill> getAllBills() {
-        List<GSTBill> GSTBills = GSTBillRepository.findAll();
-        return GSTBills.isEmpty() ? Collections.emptyList() : GSTBills;
+    // ✅ Get All Bills with Pagination
+    public Page<GSTBill> getAllBills(Pageable pageable) {
+        return GSTBillRepository.findAll(pageable);
     }
 
     public Optional<GSTBill> getBillById(Long id) {
         return GSTBillRepository.findById(id);
     }
 
-    public GSTBill createBill(GSTBill GSTBill) {
+    public GSTBill createBill(GSTBill gSTBill) {
         try {
-            GSTBill.setPaymentStatus("PENDING");
-            // Ensure each BillItem is linked to the Bill before saving
-            if (GSTBill.getGSTBillItems() != null) {
-                GSTBill.getGSTBillItems().forEach(item -> item.setBill(GSTBill));
+            gSTBill.setPaymentStatus("PENDING");
+            if (gSTBill.getGSTBillItems() != null) {
+                gSTBill.getGSTBillItems().forEach(item -> item.setBill(gSTBill));
             }
-            return GSTBillRepository.save(GSTBill);
+            return GSTBillRepository.save(gSTBill);
         } catch (Exception e) {
             throw new RuntimeException("Error creating bill", e);
         }

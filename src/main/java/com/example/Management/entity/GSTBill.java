@@ -38,4 +38,9 @@ public class GSTBill {
     // CASH, CHEQUE, ONLINE, UPI
     private Long vendor;
     private String vendorName;
+
+    private Long customer;
+    private String customerName;
+
+
 }

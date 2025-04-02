@@ -24,4 +24,9 @@ public class Vendor {
     private String bankName;
     private String accountNumber;
     private String ifscCode;
+
+    // ✅ New field to store image data as byte array
+    @Lob
+    @Column(name = "image", columnDefinition = "LONGBLOB")  // Use LONGBLOB for large images
+    private byte[] image;
 }

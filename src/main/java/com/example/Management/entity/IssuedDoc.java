@@ -23,5 +23,4 @@ public class IssuedDoc {
     private String issuedBy;
     @Lob
     private byte[] doc;
-
 }

@@ -3,6 +3,9 @@ package com.example.Management.service;
 import com.example.Management.entity.Employee;
 import com.example.Management.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,12 +19,21 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+
+
+    public Employee createEmployee(Employee employee) {
+        employee.setId(generateEmployeeId());
+        System.out.println(employee);
+        return employeeRepository.save(employee);
+    }
+
+
     private Long generateEmployeeId() {
         String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
         List<Employee> employees = employeeRepository.findAll();
         int maxId = 0;
         for (Employee emp : employees) {
-            String empIdStr = emp.getEmployeeId().toString();
+            String empIdStr = emp.getId().toString();
             if (empIdStr.startsWith(datePart)) {
                 int currentId = Integer.parseInt(empIdStr.substring(6));
                 if (currentId > maxId) {
@@ -33,13 +45,9 @@ public class EmployeeService {
         String newIdPart = String.format("%04d", newIdNumber);
         return Long.parseLong(datePart + newIdPart);
     }
-    public Employee createEmployee(Employee employee) {
-        employee.setEmployeeId(generateEmployeeId());  // Set custom ID
-        return employeeRepository.save(employee);
-    }
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
-    }
+//    public List<Employee> getAllEmployees() {
+//        return employeeRepository.findAll();
+//    }
     public Optional<Employee> getEmployeeById(Long id) {
         return employeeRepository.findById(id);
     }
@@ -55,7 +63,16 @@ public class EmployeeService {
         employee.setRole(employeeDetails.getRole());
         return employeeRepository.save(employee);
     }
+    public Page<Employee> getAllEmployees(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return employeeRepository.findAll(pageable);
+    }
+
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
+    }
+
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
     }
 }

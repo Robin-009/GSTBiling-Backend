@@ -1,10 +1,12 @@
 package com.example.Management.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -13,11 +15,19 @@ import lombok.NoArgsConstructor;
 public class Employee {
 
     @Id
-    private Long employeeId;
+    private Long id;
     private String employeeName;
     private String address;
     private Long phone;
     private String email;
     private String role;
+    private String bankName;
+    private String ifsc;
+    private String bankingEmpName;
+    private Long AccountNo;
+
+//    @JsonManagedReference
+
+
 
 }

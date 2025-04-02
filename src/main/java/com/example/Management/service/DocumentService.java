@@ -6,6 +6,8 @@ import com.example.Management.entity.Employee;
 import com.example.Management.repository.DocumentRepository;
 import com.example.Management.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,7 +57,7 @@ public class DocumentService {
         Employee employee = employeeRepository.findByEmployeeName(employeeName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with name: " + employeeName));
 
-        List<Document> documents = documentRepository.findByEmployeeId(employee.getEmployeeId());
+        List<Document> documents = documentRepository.findByEmployeeId(employee.getId());
         return documents.stream().map(this::convertToDto).collect(Collectors.toList());
     }
     private DocumentDto convertToDto(Document document) {
@@ -69,25 +71,27 @@ public class DocumentService {
         dto.setCreatedDate(document.getCreatedDate());
         return dto;
     }
-    public List<DocumentDto> getAllDocuments() {
-        return documentRepository.findAll()
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-
-    public List<DocumentDto> getDocumentsByEmployeeId(Long employeeId) {
-        List<Document> documents = documentRepository.findByEmployeeId(employeeId);
-        return documents.stream().map(this::convertToDto).collect(Collectors.toList());
-    }
 
 
-    public List<DocumentDto> getDocumentsByType(String typeOfDoc) {
-        return documentRepository.findByTypeOfDoc(typeOfDoc)
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
+//    public List<DocumentDto> getAllDocuments() {
+//        return documentRepository.findAll()
+//                .stream()
+//                .map(this::convertToDto)
+//                .collect(Collectors.toList());
+//    }
+
+//    public List<DocumentDto> getDocumentsByEmployeeId(Long employeeId) {
+//        List<Document> documents = documentRepository.findByEmployeeId(employeeId);
+//        return documents.stream().map(this::convertToDto).collect(Collectors.toList());
+//    }
+
+
+//    public List<DocumentDto> getDocumentsByType(String typeOfDoc) {
+//        return documentRepository.findByTypeOfDoc(typeOfDoc)
+//                .stream()
+//                .map(this::convertToDto)
+//                .collect(Collectors.toList());
+//    }
 
 
     public Optional<Document> getDocumentById(Long id) {
@@ -126,5 +130,17 @@ public class DocumentService {
 
     public void deleteDocument(Long id) {
         documentRepository.deleteById(id);
+    }
+
+    public Page<DocumentDto> getAllDocuments(Pageable pageable) {
+        return documentRepository.findAll(pageable).map(this::convertToDto);
+    }
+
+    public Page<DocumentDto> getDocumentsByEmployeeId(Long employeeId, Pageable pageable) {
+        return documentRepository.findByEmployeeId(employeeId, pageable).map(this::convertToDto);
+    }
+
+    public Page<DocumentDto> getDocumentsByType(String typeOfDoc, Pageable pageable) {
+        return documentRepository.findByTypeOfDoc(typeOfDoc, pageable).map(this::convertToDto);
     }
 }

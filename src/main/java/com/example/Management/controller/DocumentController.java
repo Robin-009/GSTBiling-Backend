@@ -7,6 +7,8 @@ import com.example.Management.service.DocumentService;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -36,30 +38,30 @@ public class DocumentController {
         return "Document uploaded successfully with ID: " + savedDocument.getId();
     }
 
-    @GetMapping
-    public List<DocumentDto> getAllDocuments() {
-        return documentService.getAllDocuments();
-    }
+//    @GetMapping
+//    public List<DocumentDto> getAllDocuments() {
+//        return documentService.getAllDocuments();
+//    }
     @GetMapping("/employee/name/{employeeName}")
     public List<DocumentDto> getDocumentsByEmployeeName(@PathVariable String employeeName) {
         return documentService.getDocumentsByEmployeeName(employeeName);
     }
     // Retrieve a document by employee ID and return its DTO
-    @GetMapping("/employee/{employeeId}")
-    public List<DocumentDto> getDocumentsByEmployeeId(@PathVariable Long employeeId) {
-        List<DocumentDto> documents = documentService.getDocumentsByEmployeeId(employeeId);
-        if (documents.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No documents found for this Employee ID");
-        }
-        return documents;
-    }
+//    @GetMapping("/employee/{employeeId}")
+//    public List<DocumentDto> getDocumentsByEmployeeId(@PathVariable Long employeeId) {
+//        List<DocumentDto> documents = documentService.getDocumentsByEmployeeId(employeeId);
+//        if (documents.isEmpty()) {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No documents found for this Employee ID");
+//        }
+//        return documents;
+//    }
 
 
     // Retrieve documents by type and return them as DTOs
-    @GetMapping("/type/{typeOfDoc}")
-    public List<DocumentDto> getDocumentsByType(@PathVariable String typeOfDoc) {
-        return documentService.getDocumentsByType(typeOfDoc);
-    }
+//    @GetMapping("/type/{typeOfDoc}")
+//    public Page<DocumentDto> getDocumentsByType(@PathVariable String typeOfDoc) {
+//        return documentService.getDocumentsByType(typeOfDoc);
+//    }
     @GetMapping("/download/{id}")
     public void downloadDocument(@PathVariable Long id, HttpServletResponse response) {
         Document document = documentService.getDocumentById(id)
@@ -105,4 +107,20 @@ public class DocumentController {
     public void deleteDocument(@PathVariable Long id) {
         documentService.deleteDocument(id);
     }
+
+    @GetMapping
+    public Page<DocumentDto> getAllDocuments(Pageable pageable) {
+        return documentService.getAllDocuments(pageable);
+    }
+
+    @GetMapping("/employee/{employeeId}")
+    public Page<DocumentDto> getDocumentsByEmployeeId(@PathVariable Long employeeId, Pageable pageable) {
+        return documentService.getDocumentsByEmployeeId(employeeId, pageable);
+    }
+
+    @GetMapping("/type/{typeOfDoc}")
+    public Page<DocumentDto> getDocumentsByType(@PathVariable String typeOfDoc, Pageable pageable) {
+        return documentService.getDocumentsByType(typeOfDoc, pageable);
+    }
 }
+

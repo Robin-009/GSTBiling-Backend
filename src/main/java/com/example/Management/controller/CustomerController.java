@@ -3,6 +3,9 @@ package com.example.Management.controller;
 import com.example.Management.entity.Customer;
 import com.example.Management.repository.CustomerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,23 +17,26 @@ import java.util.Optional;
 @RequestMapping("/api/customers")
 public class CustomerController {
 
-
-
     @Autowired
     private CustomerRepo customerRepo;
 
+    // ✅ Get All Customers with Pagination
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        List<Customer> customers = customerRepo.findAll();
-        return customers.isEmpty() ? Collections.emptyList() : customers;
+    public Page<Customer> getAllCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return customerRepo.findAll(pageable);
     }
 
+    // ✅ Get Customer by ID
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
         Optional<Customer> customer = customerRepo.findById(id);
         return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // ✅ Create Customer
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         try {
@@ -41,6 +47,7 @@ public class CustomerController {
         }
     }
 
+    // ✅ Update Customer
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer customerDetails) {
         Optional<Customer> customerOptional = customerRepo.findById(id);
@@ -57,6 +64,7 @@ public class CustomerController {
         }
     }
 
+    // ✅ Delete Customer
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCustomer(@PathVariable Long id) {
         try {
@@ -65,5 +73,17 @@ public class CustomerController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error deleting customer");
         }
+    }
+
+    @GetMapping("/fectch")
+    public List<Customer> getAllCustomers() {
+        List<Customer> customers = customerRepo.findAll();
+        return customers.isEmpty() ? Collections.emptyList() : customers;
+    }
+
+    @GetMapping("fetchby/{id}")
+    public ResponseEntity<Customer> fetchCustomerById(@PathVariable Long id) {
+        Optional<Customer> customer = customerRepo.findById(id);
+        return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

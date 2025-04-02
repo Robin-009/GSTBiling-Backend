@@ -1,9 +1,13 @@
 package com.example.Management.service;
 
+import com.example.Management.dto.IssuedDocDTO;
+import com.example.Management.entity.Employee;
 import com.example.Management.entity.IssuedDoc;
 import com.example.Management.repository.EmployeeRepository;
 import com.example.Management.repository.IssuedDocRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,21 +46,43 @@ public class IssuedDocService {
         }
 
         return issuedDocRepository.save(issuedDoc);
-    }public List<IssuedDoc> getAllIssuedDocs() {
-        return issuedDocRepository.findAll();
     }
+
+    public Page<IssuedDocDTO> getAllIssuedDocs(Pageable pageable) {
+        Page<IssuedDoc> issuedDocs = issuedDocRepository.findAll(pageable);
+
+        return issuedDocs.map(doc -> {
+            Optional<Employee> employee = employeeRepository.findById(doc.getEmployeeId());
+            return new IssuedDocDTO(
+                    doc.getId(),
+                    doc.getEmployeeId(),
+                    employee.map(Employee::getEmployeeName).orElse("N/A"),
+                    employee.map(Employee::getRole).orElse("N/A"),
+                    doc.getTypeOfDoc(),
+                    doc.getDateOfIssue(),
+                    doc.getIssuedBy(),
+                    doc.getDoc()
+            );
+        });
+    }
+
+
     public Optional<IssuedDoc> getIssuedDocByEmployeeId(Long employeeId) {
         return issuedDocRepository.findByEmployeeId(employeeId);
     }
-    public List<IssuedDoc> getIssuedDocsByDate(LocalDate dateOfIssue) {
-        return issuedDocRepository.findByDateOfIssue(dateOfIssue);
-    }
-    public List<IssuedDoc> getIssuedDocsByTypeOfDoc(String typeOfDoc) {
-        return issuedDocRepository.findByTypeOfDoc(typeOfDoc);
-    }
-    public List<IssuedDoc> getIssuedDocsByIssuedBy(String issuedBy) {
-        return issuedDocRepository.findByIssuedBy(issuedBy);
-    }
+
+
+//    public List<IssuedDoc> getIssuedDocsByDate(LocalDate dateOfIssue) {
+//        return issuedDocRepository.findByDateOfIssue(dateOfIssue);
+//    }
+//    public List<IssuedDoc> getIssuedDocsByTypeOfDoc(String typeOfDoc) {
+//        return issuedDocRepository.findByTypeOfDoc(typeOfDoc);
+//    }
+//    public List<IssuedDoc> getIssuedDocsByIssuedBy(String issuedBy) {
+//        return issuedDocRepository.findByIssuedBy(issuedBy);
+//    }
+
+
     public Optional<IssuedDoc> getIssuedDocById(Long id) {
         return issuedDocRepository.findById(id);
     }
@@ -85,5 +111,26 @@ public class IssuedDocService {
 
     public void deleteIssuedDoc(Long id) {
         issuedDocRepository.deleteById(id);
+    }
+
+
+//    public Page<IssuedDoc> getAllIssuedDocs(Pageable pageable) {
+//        return issuedDocRepository.findAll(pageable);
+//    }
+
+    public Page<IssuedDoc> getIssuedDocsByEmployeeId(Long employeeId, Pageable pageable) {
+        return issuedDocRepository.findByEmployeeId(employeeId, pageable);
+    }
+
+    public Page<IssuedDoc> getIssuedDocsByDate(LocalDate dateOfIssue, Pageable pageable) {
+        return issuedDocRepository.findByDateOfIssue(dateOfIssue, pageable);
+    }
+
+    public Page<IssuedDoc> getIssuedDocsByTypeOfDoc(String typeOfDoc, Pageable pageable) {
+        return issuedDocRepository.findByTypeOfDoc(typeOfDoc, pageable);
+    }
+
+    public Page<IssuedDoc> getIssuedDocsByIssuedBy(String issuedBy, Pageable pageable) {
+        return issuedDocRepository.findByIssuedBy(issuedBy, pageable);
     }
 }
